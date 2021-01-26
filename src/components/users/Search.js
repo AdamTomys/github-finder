@@ -1,53 +1,44 @@
-import React, {Component} from "react";
-import PropTypes from 'prop-types';
+import React, {useContext, useState} from "react";
+import GithubContext from '../../context/github/githubContext';
+import AlertContext from '../../context/alert/alertContext';
 
-class Search extends Component {
-  state = {
-    text: ''
-  }
+const Search = () => {
+  const githubContext = useContext(GithubContext);
+  const alertContext = useContext(AlertContext);
+  const {searchUsers, showClearButton, initData} = githubContext;
+  const {setAlert} = alertContext;
 
-  static propTypes = {
-    searchUsers: PropTypes.func,
-    clearUsers: PropTypes.func,
-    showClear: PropTypes.bool,
-    setAlert: PropTypes.func,
-  }
+  const [text, setText] = useState('');
 
-  onChange = (e) => this.setState({[e.target.name]: e.target.value});
+  const onChange = (e) => setText(e.target.value);
 
-  onSubmit(e) {
+  const onSubmit = e => {
     e.preventDefault();
-    if (this.state.text === '') {
-      this.props.setAlert('Please enter something', 'light');
+    if (text === '') {
+      setAlert('Please enter something', 'light');
     } else {
-      this.props.searchUsers(this.state.text);
-      this.setState({text: ''})
+      searchUsers(text);
+      setText('');
     }
   };
-  //jeśli funkcja nie jest strzałkowa - trzeba ją wiązać za pomocą .bind(this)
-  //lepiej zrobić strzałkową
-  // wyrażenia ***** ? ** : ** oraz ****** && ******* są równoważne (to drugie nie posiada opcji na fałsz)
 
-  render() {
-    const {showClear, clearUsers} = this.props;
     return (
       <div>
-        <form className="form" onSubmit={this.onSubmit.bind(this)}>
+        <form className="form" onSubmit={onSubmit}>
           <input
             type="text"
             name="text"
             placeholder="Search users..."
-            value={this.state.text}
-            onChange={this.onChange}
+            value={text}
+            onChange={onChange}
           />
           <input type="submit" value="Search" className="btn btn-dark btn-block"/>
         </form>
-        {showClear &&
-        <button className="btn btn-light btn-block" onClick={clearUsers}>Clear</button>
+        {showClearButton &&
+        <button className="btn btn-light btn-block" onClick={initData}>Clear</button>
         }
       </div>
     );
-  }
 }
 
 export default Search;
